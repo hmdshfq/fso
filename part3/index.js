@@ -23,11 +23,21 @@ const notes = [
 ];
 
 server.get('/', (request, response) => {
-    response.send('<h1>Hello world</h1>');
+    response.send('<h1>Hello World</h1>');
 });
 
 server.get('/api/notes', (request, response) => {
     response.json(notes);
+});
+
+server.get('/api/notes/:id', (request, response) => {
+    const id = request.params.id;
+    const note = notes.find( note => note.id === id);
+    if (note) {
+        response.json(note);
+    } else {
+        response.status(404).end();
+    }
 });
 
 server.listen(PORT, () => {
