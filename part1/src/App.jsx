@@ -1,36 +1,29 @@
-import Header from './Header';
-import Content from './Content';
-import Total from './Total'
+import Header from "./Header";
+import Content from "./Content";
+import Total from "./Total";
 
 const App = () => {
-    const course = 'Half Stack application development';
-    const content = [
-        {
-            id: 0,
-            name: 'Fundamentals of React',
-            exercises: 10,
-        },
-        {
-            id: 1,
-            name: 'Using props to pass data',
-            exercises: 7,
-        },
-        {
-            id: 2,
-            name: 'State of a component',
-            exercises: 14,
-        },
-    ]
-    const total = content.reduce((accumulator, object) => accumulator + object.exercises, 0);
+    const course = "Half Stack application development";
+    const part1 = {
+        name: "Fundamentals of React",
+        exercises: 10,
+    };
+    const part2 = {
+        name: "Using props to pass data",
+        exercises: 7,
+    };
+    const part3 = {
+        name: "State of a component",
+        exercises: 14,
+    };
+    const total = part1.exercises + part2.exercises + part3.exercises;
 
     return (
         <div>
             <Header course={course} />
-            {
-                content.map(({id, name, exercises}) => {
-                    return <Content key={id} name={name} exercises={exercises} />
-                })
-            }
+            <Content name={part1.name} exercises={part1.exercises} />
+            <Content name={part2.name} exercises={part2.exercises} />
+            <Content name={part3.name} exercises={part3.exercises} />
             <Total total={total} />
         </div>
     );
