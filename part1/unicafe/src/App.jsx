@@ -4,6 +4,12 @@ const Button = ({ text, onClick }) => {
     return <button onClick={onClick}>{text}</button>;
 };
 
+const StatisticsLine = ({ text, value }) => (
+    <p>
+        {text}: {value}
+    </p>
+);
+
 const Statistics = ({
     good,
     neutral,
@@ -14,12 +20,15 @@ const Statistics = ({
 }) => {
     return (
         <>
-            <p>Good: {good}</p>
-            <p>Neutral: {neutral}</p>
-            <p>Bad: {bad}</p>
-            <p>All: {total}</p>
-            <p>Average: {average}</p>
-            <p>Positive Percentage: {positivePercentage}%</p>
+            <StatisticsLine text="Good" value={good} />
+            <StatisticsLine text="Neutral" value={neutral} />
+            <StatisticsLine text="Bad" value={bad} />
+            <StatisticsLine text="All" value={total} />
+            <StatisticsLine text="Average" value={average} />
+            <StatisticsLine
+                text="Positive Percentage"
+                value={`${positivePercentage}%`}
+            />
         </>
     );
 };
@@ -31,38 +40,27 @@ const App = () => {
     const [bad, setBad] = useState(0);
     const [total, setTotal] = useState(0);
     const [average, setAverage] = useState(0);
-    const [positivePercentage, setPositivePercentage] = useState(0);
 
     const increaseGood = () => {
         const nextValue = good + 1;
         setGood(nextValue);
         setTotal(total + 1);
-        findAverage();
-        findPositivePercentage();
         setIsFeedbackGiven(true);
     };
     const increaseNeutral = () => {
         const nextValue = neutral + 1;
         setNeutral(nextValue);
         setTotal(total + 1);
-        findAverage();
-        findPositivePercentage();
         setIsFeedbackGiven(true);
     };
     const increaseBad = () => {
         const nextValue = bad + 1;
         setBad(nextValue);
         setTotal(total + 1);
-        findAverage();
-        findPositivePercentage();
         setIsFeedbackGiven(true);
     };
-    const findAverage = () => {
-        setAverage((good - bad) / (total === 0 ? 1 : total));
-    };
-    const findPositivePercentage = () => {
-        setPositivePercentage((good / total) * 100);
-    };
+    const findAverage = (good - bad) / (total === 0 ? 1 : total);
+    const findPositivePercentage = (good / (total === 0 ? 1 : total)) * 100;
 
     return (
         <div>
@@ -77,8 +75,8 @@ const App = () => {
                     neutral={neutral}
                     bad={bad}
                     total={total}
-                    average={average}
-                    positivePercentage={positivePercentage}
+                    average={findAverage}
+                    positivePercentage={findPositivePercentage}
                 />
             ) : (
                 <p>No feedback given</p>
