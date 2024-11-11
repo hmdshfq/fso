@@ -49,12 +49,28 @@ const App = () => {
         setAnecdotes([...nextAnecdotes]);
     };
 
+    const famousAnecdote = () => {
+        let maximumVotes = 0;
+        let maximumIndex = 0;
+        anecdotes.map((anecdote, index) => {
+            if (anecdote.votes > maximumVotes) {
+                maximumVotes = anecdote.votes;
+                maximumIndex = index;
+            }
+        });
+        return anecdotes[maximumIndex];
+    };
+
     return (
         <div>
+            <h1>Anecdote of the day</h1>
             <p>{anecdotes[selected].quote}</p>
             <p>Has {anecdotes[selected].votes} votes</p>
             <button onClick={handleVote}>Vote</button>
             <button onClick={nextAnecdote}>Next anecdote</button>
+            <h2>Anecdote with most votes</h2>
+            <p>{famousAnecdote().quote}</p>
+            <p>{famousAnecdote().votes}</p>
         </div>
     );
 };
