@@ -4,7 +4,7 @@ const Button = ({ text, onClick }) => {
     return <button onClick={onClick}>{text}</button>;
 };
 
-const Display = ({
+const Statistics = ({
     good,
     neutral,
     bad,
@@ -67,7 +67,7 @@ const App = () => {
             <Button onClick={increaseGood} text="Good" />
             <Button onClick={increaseNeutral} text="Neutral" />
             <Button onClick={increaseBad} text="Bad" />
-            <Display
+            <Statistics
                 good={good}
                 neutral={neutral}
                 bad={bad}
