@@ -5,9 +5,10 @@ const Button = ({ text, onClick }) => {
 };
 
 const StatisticsLine = ({ text, value }) => (
-    <p>
-        {text}: {value}
-    </p>
+    <tr>
+        <td>{text}</td>
+        <td>{value}</td>
+    </tr>
 );
 
 const Statistics = ({
@@ -19,17 +20,19 @@ const Statistics = ({
     positivePercentage,
 }) => {
     return (
-        <>
-            <StatisticsLine text="Good" value={good} />
-            <StatisticsLine text="Neutral" value={neutral} />
-            <StatisticsLine text="Bad" value={bad} />
-            <StatisticsLine text="All" value={total} />
-            <StatisticsLine text="Average" value={average} />
-            <StatisticsLine
-                text="Positive Percentage"
-                value={`${positivePercentage}%`}
-            />
-        </>
+        <table>
+            <tbody>
+                <StatisticsLine text="Good" value={good} />
+                <StatisticsLine text="Neutral" value={neutral} />
+                <StatisticsLine text="Bad" value={bad} />
+                <StatisticsLine text="All" value={total} />
+                <StatisticsLine text="Average" value={average} />
+                <StatisticsLine
+                    text="Positive"
+                    value={`${positivePercentage}%`}
+                />
+            </tbody>
+        </table>
     );
 };
 
@@ -59,8 +62,11 @@ const App = () => {
         setTotal(total + 1);
         setIsFeedbackGiven(true);
     };
-    const findAverage = (good - bad) / (total === 0 ? 1 : total);
-    const findPositivePercentage = (good / (total === 0 ? 1 : total)) * 100;
+    const findAverage = () => ((good - bad) / (total === 0 ? 1 : total)).toFixed(1);
+    const findPositivePercentage = () => (
+        (good / (total === 0 ? 1 : total)) *
+        100
+    ).toFixed(1);
 
     return (
         <div>
@@ -75,8 +81,8 @@ const App = () => {
                     neutral={neutral}
                     bad={bad}
                     total={total}
-                    average={findAverage}
-                    positivePercentage={findPositivePercentage}
+                    average={findAverage()}
+                    positivePercentage={findPositivePercentage()}
                 />
             ) : (
                 <p>No feedback given</p>
