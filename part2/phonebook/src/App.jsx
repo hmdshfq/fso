@@ -1,4 +1,7 @@
 import { useState } from "react";
+import Filter from "./components/Filter";
+import ContactForm from "./components/ContactForm";
+import Contacts from "./components/Contacts";
 
 const App = () => {
     const [persons, setPersons] = useState([
@@ -15,17 +18,24 @@ const App = () => {
     const handleSearch = (e) => {
         const nextSearch = e.target.value;
         setSearch(nextSearch);
-        const nextSearchResult = persons.filter((person) =>
-            person.name.toLowerCase().includes(nextSearch)
-        );
+        const nextSearchResult =
+            nextSearch === ""
+                ? []
+                : persons.filter((person) =>
+                    person.name.toLowerCase().includes(nextSearch)
+                );
         setSearchResult(nextSearchResult);
     };
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        const nextPersons = [...persons, { name: newName, number: newNumber }];
+        const nextPersons = [
+            ...persons,
+            { name: newName, number: newNumber, id: persons.length + 1 },
+        ];
         setPersons(nextPersons);
         setNewName("");
+        setNewNumber("");
     };
 
     const handleNameChange = (e) => {
@@ -46,47 +56,21 @@ const App = () => {
     return (
         <div>
             <h1>Phonebook</h1>
-            <label htmlFor="search">Search: </label>
-            <input id="search" value={search} onChange={handleSearch} />
-            {searchResult.map((result) => (
-                <p key={result.id}>
-                    {result.name} {result.number}
-                </p>
-            ))}
+            <Filter
+                search={search}
+                searchResult={searchResult}
+                handleSearch={handleSearch}
+            />
             <h2>Add a contact</h2>
-            <form onSubmit={handleSubmit}>
-                <div>
-                    <p>
-                        <label htmlFor="name">Name: </label>
-                        <input
-                            id="name"
-                            value={newName}
-                            onChange={handleNameChange}
-                            placeholder={newName}
-                        />
-                    </p>
-                    <p>
-                        <label htmlFor="number">Number: </label>
-                        <input
-                            id="number"
-                            value={newNumber}
-                            onChange={handleNumberChange}
-                            placeholder={newNumber}
-                        />
-                    </p>
-                </div>
-                <div>
-                    <button type="submit">Add</button>
-                </div>
-            </form>
+            <ContactForm
+                newName={newName}
+                newNumber={newNumber}
+                handleSubmit={handleSubmit}
+                handleNameChange={handleNameChange}
+                handleNumberChange={handleNumberChange}
+            />
             <h2>Contacts</h2>
-            {persons.map((person) => {
-                return (
-                    <p key={person.name}>
-                        {person.name} {person.number}
-                    </p>
-                );
-            })}
+            <Contacts persons={persons} />
         </div>
     );
 };
