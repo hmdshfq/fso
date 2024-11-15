@@ -8,29 +8,28 @@ const App = () => {
         e.preventDefault();
         const nextPersons = [...persons, { name: newName }];
         setPersons(nextPersons);
-        setNewName('');
+        setNewName("");
     };
 
-    const handleChange = e => {
+    const handleChange = (e) => {
         const nextNewName = e.target.value;
-        setNewName(nextNewName);
-    }
+        const checkNewName = persons.filter(
+            (person) => person.name === nextNewName
+        );
+        checkNewName.length === 1
+            ? alert(`${nextNewName} is already added to phonebook`)
+            : setNewName(nextNewName);
+    };
 
     return (
         <div>
             <h2>Phonebook</h2>
             <form onSubmit={handleSubmit}>
                 <div>
-                    Name:{" "}
-                    <input
-                        value={newName}
-                        onChange={handleChange}
-                    />
+                    Name: <input value={newName} onChange={handleChange} />
                 </div>
                 <div>
-                    <button type="submit">
-                        Add
-                    </button>
+                    <button type="submit">Add</button>
                 </div>
             </form>
             <h2>Numbers</h2>
