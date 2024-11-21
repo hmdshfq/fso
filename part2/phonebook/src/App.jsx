@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import Filter from "./components/Filter";
 import ContactForm from "./components/ContactForm";
 import Contacts from "./components/Contacts";
-import contactsService from './services/contacts';
+import contactsService from "./services/contacts";
 
 const App = () => {
     const [persons, setPersons] = useState([]);
@@ -18,34 +18,52 @@ const App = () => {
             nextSearch === ""
                 ? []
                 : persons.filter((person) =>
-                    person.name.toLowerCase().includes(nextSearch)
-                );
+                      person.name.toLowerCase().includes(nextSearch)
+                  );
         setSearchResult(nextSearchResult);
     };
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        const newPerson = { 
-            name: newName, 
-            number: newNumber
-        }
-        contactsService
-            .create(newPerson)
-            .then(returnedPerson => {
+        const newPerson = {
+            name: newName,
+            number: newNumber,
+        };
+
+        const existingContact = persons.find(
+            (person) => person.name === newPerson.name
+        );
+
+        if (existingContact !== undefined) {
+            const confirmation = window.confirm(
+                `${newPerson.name} is already added to phone-book, replace the old number with a new one?`
+            );
+            if (confirmation) {
+                contactsService
+                    .update(existingContact.id, newPerson)
+                    .then((returnedPerson) => {
+                        setPersons(
+                            persons.map((person) =>
+                                person.id !== returnedPerson.id
+                                    ? person
+                                    : returnedPerson
+                            )
+                        );
+                    });
+            }
+        } else {
+            contactsService.create(newPerson).then((returnedPerson) => {
                 setPersons([...persons, returnedPerson]);
-            })
+            });
+        }
+
         setNewName("");
         setNewNumber("");
     };
 
     const handleNameChange = (e) => {
         const nextName = e.target.value;
-        const checkNewName = persons.filter(
-            (person) => person.name === nextName
-        );
-        checkNewName.length === 1
-            ? alert(`${nextName} is already added to phonebook`)
-            : setNewName(nextName);
+        setNewName(nextName);
     };
 
     const handleNumberChange = (e) => {
@@ -53,10 +71,10 @@ const App = () => {
         setNewNumber(nextNumber);
     };
 
-    useEffect(()=>{
-        contactsService
-            .getAll()
-            .then(initialContacts => setPersons(initialContacts));
+    useEffect(() => {
+        contactsService.getAll().then((initialContacts) => {
+            setPersons(initialContacts);
+        });
     }, []);
 
     return (
