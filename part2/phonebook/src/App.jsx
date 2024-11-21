@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
-import axios from 'axios';
 import Filter from "./components/Filter";
 import ContactForm from "./components/ContactForm";
 import Contacts from "./components/Contacts";
+import contactsService from './services/contacts';
 
 const App = () => {
     const [persons, setPersons] = useState([]);
@@ -25,11 +25,15 @@ const App = () => {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        const nextPersons = [
-            ...persons,
-            { name: newName, number: newNumber, id: persons.length + 1 },
-        ];
-        setPersons(nextPersons);
+        const newPerson = { 
+            name: newName, 
+            number: newNumber
+        }
+        contactsService
+            .create(newPerson)
+            .then(returnedPerson => {
+                setPersons([...persons, returnedPerson]);
+            })
         setNewName("");
         setNewNumber("");
     };
@@ -50,9 +54,9 @@ const App = () => {
     };
 
     useEffect(()=>{
-        axios
-            .get("http://localhost:3001/persons")
-            .then(response => setPersons(response.data));
+        contactsService
+            .getAll()
+            .then(initialContacts => setPersons(initialContacts));
     }, []);
 
     return (
@@ -72,7 +76,7 @@ const App = () => {
                 handleNumberChange={handleNumberChange}
             />
             <h2>Contacts</h2>
-            <Contacts persons={persons} />
+            <Contacts persons={persons} setPersons={setPersons} />
         </div>
     );
 };
