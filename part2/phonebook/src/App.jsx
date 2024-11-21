@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import Filter from "./components/Filter";
 import ContactForm from "./components/ContactForm";
 import Contacts from "./components/Contacts";
+import Notification from "./Notification";
 import contactsService from "./services/contacts";
 
 const App = () => {
@@ -10,6 +11,7 @@ const App = () => {
     const [newNumber, setNewNumber] = useState("");
     const [search, setSearch] = useState("");
     const [searchResult, setSearchResult] = useState([]);
+    const [message, setMessage] = useState(null);
 
     const handleSearch = (e) => {
         const nextSearch = e.target.value;
@@ -49,11 +51,19 @@ const App = () => {
                                     : returnedPerson
                             )
                         );
+                        setMessage(`Updated ${returnedPerson.name}`)
+                        setTimeout(()=>{
+                            setMessage(null)
+                        }, 5000)
                     });
             }
         } else {
             contactsService.create(newPerson).then((returnedPerson) => {
                 setPersons([...persons, returnedPerson]);
+                setMessage(`Added ${returnedPerson.name}`)
+                setTimeout(()=>{
+                    setMessage(null)
+                }, 5000)
             });
         }
 
@@ -80,6 +90,7 @@ const App = () => {
     return (
         <div>
             <h1>Phonebook</h1>
+            <Notification message={message} />
             <Filter
                 search={search}
                 searchResult={searchResult}
@@ -94,7 +105,7 @@ const App = () => {
                 handleNumberChange={handleNumberChange}
             />
             <h2>Contacts</h2>
-            <Contacts persons={persons} setPersons={setPersons} />
+            <Contacts persons={persons} setPersons={setPersons} setMessage={setMessage}/>
         </div>
     );
 };
