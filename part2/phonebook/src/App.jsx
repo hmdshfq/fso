@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import Filter from "./components/Filter";
 import ContactForm from "./components/ContactForm";
 import Contacts from "./components/Contacts";
-import Notification from "./Notification";
+import Notification from "./components/Notification";
 import contactsService from "./services/contacts";
 
 const App = () => {
@@ -12,6 +12,7 @@ const App = () => {
     const [search, setSearch] = useState("");
     const [searchResult, setSearchResult] = useState([]);
     const [message, setMessage] = useState(null);
+    const [isSuccess, setIsSuccess] = useState(true);
 
     const handleSearch = (e) => {
         const nextSearch = e.target.value;
@@ -51,19 +52,33 @@ const App = () => {
                                     : returnedPerson
                             )
                         );
-                        setMessage(`Updated ${returnedPerson.name}`)
-                        setTimeout(()=>{
-                            setMessage(null)
-                        }, 5000)
+                        setMessage(`Updated ${returnedPerson.name}`);
+                        setIsSuccess(true);
+                        setTimeout(() => {
+                            setMessage(null);
+                        }, 5000);
+                    })
+                    .catch((error) => {
+                        setMessage(`The contact '${existingContact.name}' was already deleted from server`);
+                        setIsSuccess(false);
+                        setTimeout(() => {
+                            setMessage(null);
+                        }, 5000);
+                        setPersons(
+                            persons.filter(
+                                (person) => person.id !== existingContact.id
+                            )
+                        );
                     });
             }
         } else {
             contactsService.create(newPerson).then((returnedPerson) => {
                 setPersons([...persons, returnedPerson]);
-                setMessage(`Added ${returnedPerson.name}`)
-                setTimeout(()=>{
-                    setMessage(null)
-                }, 5000)
+                setMessage(`Added ${returnedPerson.name}`);
+                setIsSuccess(true);
+                setTimeout(() => {
+                    setMessage(null);
+                }, 5000);
             });
         }
 
@@ -90,7 +105,7 @@ const App = () => {
     return (
         <div>
             <h1>Phonebook</h1>
-            <Notification message={message} />
+            <Notification message={message} isSuccess={isSuccess} />
             <Filter
                 search={search}
                 searchResult={searchResult}
@@ -105,7 +120,11 @@ const App = () => {
                 handleNumberChange={handleNumberChange}
             />
             <h2>Contacts</h2>
-            <Contacts persons={persons} setPersons={setPersons} setMessage={setMessage}/>
+            <Contacts
+                persons={persons}
+                setPersons={setPersons}
+                setMessage={setMessage}
+            />
         </div>
     );
 };
