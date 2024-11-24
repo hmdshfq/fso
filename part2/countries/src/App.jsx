@@ -1,4 +1,7 @@
 import { useState, useEffect } from "react";
+import Button from "./components/Button";
+import CountryData from './components/CountryData';
+import CountriesForm from "./components/CountriesForm";
 
 function App() {
     const [search, setSearch] = useState("");
@@ -12,6 +15,7 @@ function App() {
 
     useEffect(() => {
         if (search === "") {
+            setCountries([]);
             return;
         }
         const timeoutId = setTimeout(() => {
@@ -51,18 +55,9 @@ function App() {
     return (
         <>
             <h1>Data for countries</h1>
-            <form>
-                <label htmlFor="search">Find countries: </label>
-                <input
-                    id="search"
-                    type="text"
-                    value={search}
-                    onChange={handleSearch}
-                    autoFocus
-                />
-            </form>
+            <CountriesForm search={search} handleSearch={handleSearch} />
             <h2>Country Data</h2>
-            {countries.length === 0 && (
+            {search === "" && (
                 <p>Please type the name of a country in the search</p>
             )}
             {countries.length > 10 && (
@@ -71,44 +66,15 @@ function App() {
             {countries.length <= 10 && countries.length > 1 && (
                 <ul>
                     {countries.map((country) => (
-                        <li key={country}>{country}</li>
+                        <li key={country}>
+                            {country}{" "}
+                            <Button country={country} setSearch={setSearch} />
+                        </li>
                     ))}
                 </ul>
             )}
             {countries.length === 1 && Object.keys(country).length !== 0 && (
-                <div>
-                    <h3>{country.name.common}</h3>
-                    <figure>
-                        <img
-                            src={country.flags.svg}
-                            alt={country.flags.alt}
-                            width={250}
-                        />
-                        <figcaption></figcaption>
-                    </figure>
-                    <p>Capital(s):</p>
-                    <ul>
-                        {country.capital.map((c) => (
-                            <li key={c}>{c}</li>
-                        ))}
-                    </ul>
-                    <p>Area: {`${country.area.toLocaleString()} km²`}</p>
-                    <p>Population: {country.population.toLocaleString()}</p>
-                    <p>
-                        Currency name:{" "}
-                        {Object.values(country.currencies)[0].name}
-                    </p>
-                    <p>
-                        Currency symbol:{" "}
-                        {Object.values(country.currencies)[0].symbol}
-                    </p>
-                    <p>Language(s):</p>
-                    <ul>
-                        {Object.values(country.languages).map((language) => (
-                            <li key={language}>{language}</li>
-                        ))}
-                    </ul>
-                </div>
+                <CountryData country={country} />
             )}
         </>
     );
