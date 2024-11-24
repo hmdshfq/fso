@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 
 function App() {
-    // https://studies.cs.helsinki.fi/restcountries/
     const [search, setSearch] = useState("");
     const [countries, setCountries] = useState([]);
 
@@ -11,8 +10,26 @@ function App() {
     };
 
     useEffect(() => {
-        
-    }, []);
+        const timeoutId = setTimeout(() => {
+            fetch("https://studies.cs.helsinki.fi/restcountries/api/all/")
+                .then((response) => response.json())
+                .then((data) => {
+                    const allCountries = data;
+                    const allCountriesNames = allCountries.map(
+                        (country) => country.name.common
+                    );
+                    const filteredNames = allCountriesNames.filter((country) =>
+                        country.toLowerCase().includes(search)
+                    );
+                    console.log(filteredNames);
+                    console.log(search);
+                    setCountries(filteredNames);
+                });
+        }, 1000);
+        return () => {
+            clearTimeout(timeoutId);
+        };
+    }, [search]);
 
     return (
         <>
@@ -26,6 +43,8 @@ function App() {
                     onChange={handleSearch}
                 />
             </form>
+            <h2>Country Data</h2>
+            <p>{countries}</p>
         </>
     );
 }
