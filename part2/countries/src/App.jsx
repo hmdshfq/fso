@@ -1,12 +1,16 @@
 import { useState, useEffect } from "react";
 import Button from "./components/Button";
-import CountryData from './components/CountryData';
+import CountryData from "./components/CountryData";
 import CountriesForm from "./components/CountriesForm";
+import countryServices from "./services/country";
 
 function App() {
     const [search, setSearch] = useState("");
-    const [countries, setCountries] = useState([]);
+    const [allCountries, setAllCountries] = useState([]);
+    const [allCountriesNames, setAllCountriesNames] = useState([]);
+    const [filteredNames, setFilteredNames] = useState([]);
     const [country, setCountry] = useState({});
+    const [countryIndex, setCountryIndex] = useState(null);
 
     const handleSearch = (event) => {
         event.preventDefault();
@@ -14,43 +18,39 @@ function App() {
     };
 
     useEffect(() => {
+        countryServices.getAll().then((initialCountries) => {
+            const nextAllCountries = [...initialCountries];
+            setAllCountries(nextAllCountries);
+            const nextAllCountriesNames = nextAllCountries.map(
+                (country) => country.name.common
+            );
+            setAllCountriesNames(nextAllCountriesNames);
+        });
+    }, []);
+
+    useEffect(() => {
         if (search === "") {
-            setCountries([]);
+            setFilteredNames([]);
             return;
         }
         const timeoutId = setTimeout(() => {
-            fetch("https://studies.cs.helsinki.fi/restcountries/api/all/")
-                .then((response) => response.json())
-                .then((data) => {
-                    const allCountries = data;
-                    const allCountriesNames = allCountries.map(
-                        (country) => country.name.common
-                    );
-                    const filteredNames = allCountriesNames.filter((country) =>
-                        country.toLowerCase().includes(search)
-                    );
-                    setCountries(filteredNames);
-                    filteredNames.length === 1 &&
-                        fetch(
-                            `https://studies.cs.helsinki.fi/restcountries/api/name/${filteredNames[0]}`
-                        )
-                            .then((response) => response.json())
-                            .then((data) => {
-                                const nextCountry = { ...data };
-                                setCountry(nextCountry);
-                            })
-                            .catch((error) => {
-                                console.log(error);
-                            });
-                })
-                .catch((error) => {
-                    console.log(error);
-                });
+            const nextFilteredNames = allCountriesNames.filter((country) =>
+                country.toLowerCase().includes(search)
+            );
+            setFilteredNames(nextFilteredNames);
+            if (nextFilteredNames.length === 1) {
+                countryServices
+                    .getCountry(nextFilteredNames[0])
+                    .then((country) => {
+                        const nextCountry = { ...country };
+                        setCountry(nextCountry);
+                    });
+            }
         }, 500);
         return () => {
             clearTimeout(timeoutId);
         };
-    }, [search]);
+    }, [search, allCountriesNames, country]);
 
     return (
         <>
@@ -60,22 +60,22 @@ function App() {
             {search === "" && (
                 <p>Please type the name of a country in the search</p>
             )}
-            {countries.length > 10 && (
+            {filteredNames.length > 10 && (
                 <p>Too many matches please specify your search</p>
             )}
-            {countries.length <= 10 && countries.length > 1 && (
+            {filteredNames.length <= 10 && filteredNames.length > 1 && (
                 <ul>
-                    {countries.map((country) => (
-                        <li key={country}>
-                            {country}{" "}
-                            <Button country={country} setSearch={setSearch} />
+                    {filteredNames.map((name) => (
+                        <li key={name}>
+                            {name} <Button name={name} />
                         </li>
                     ))}
                 </ul>
             )}
-            {countries.length === 1 && Object.keys(country).length !== 0 && (
-                <CountryData country={country} />
-            )}
+            {filteredNames.length === 1 &&
+                Object.keys(country).length !== 0 && (
+                    <CountryData country={country} />
+                )}
         </>
     );
 }
