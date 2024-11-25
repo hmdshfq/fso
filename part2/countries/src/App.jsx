@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
-import Button from "./components/Button";
 import CountryData from "./components/CountryData";
 import CountriesForm from "./components/CountriesForm";
+import CountriesList from "./components/CountriesList";
 import countryServices from "./services/country";
 
 function App() {
@@ -9,8 +9,6 @@ function App() {
     const [allCountries, setAllCountries] = useState([]);
     const [allCountriesNames, setAllCountriesNames] = useState([]);
     const [filteredNames, setFilteredNames] = useState([]);
-    const [country, setCountry] = useState({});
-    const [countryIndex, setCountryIndex] = useState(null);
 
     const handleSearch = (event) => {
         event.preventDefault();
@@ -38,44 +36,35 @@ function App() {
                 country.toLowerCase().includes(search)
             );
             setFilteredNames(nextFilteredNames);
-            if (nextFilteredNames.length === 1) {
-                countryServices
-                    .getCountry(nextFilteredNames[0])
-                    .then((country) => {
-                        const nextCountry = { ...country };
-                        setCountry(nextCountry);
-                    });
-            }
         }, 500);
         return () => {
             clearTimeout(timeoutId);
         };
-    }, [search, allCountriesNames, country]);
+    }, [search]);
 
     return (
         <>
             <h1>Data for countries</h1>
+            
             <CountriesForm search={search} handleSearch={handleSearch} />
+            
             <h2>Country Data</h2>
+            
             {search === "" && (
                 <p>Please type the name of a country in the search</p>
             )}
+            
             {filteredNames.length > 10 && (
                 <p>Too many matches please specify your search</p>
             )}
+            
             {filteredNames.length <= 10 && filteredNames.length > 1 && (
-                <ul>
-                    {filteredNames.map((name) => (
-                        <li key={name}>
-                            {name} <Button name={name} />
-                        </li>
-                    ))}
-                </ul>
+                <CountriesList names={filteredNames} countries={allCountries} />
             )}
-            {filteredNames.length === 1 &&
-                Object.keys(country).length !== 0 && (
-                    <CountryData country={country} />
-                )}
+
+            {filteredNames.length === 1 && (
+                <CountryData name={filteredNames[0]} countries={allCountries} />
+            )}
         </>
     );
 }

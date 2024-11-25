@@ -1,4 +1,5 @@
-const CountryData = ({country}) => {
+const CountryData = ({ name, countries }) => {
+    const country = countries.find((country) => country.name.common === name);
     return (
         <div>
             <h3>{country.name.common}</h3>

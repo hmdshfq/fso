@@ -1,13 +1,11 @@
-import { useState } from 'react';
-
-const Button = () => {
-    const [isCountryShown, setIsCountryShown] = useState(false);
-
+const Button = ({isShown, setIsShown, index}) => {
     const handleVisibility = () => {
-        setIsCountryShown(!isCountryShown);
+        const nextArray = [...isShown];
+        nextArray[index] = !isShown[index];
+        setIsShown(nextArray);
     }
     return (
-        <button onClick={handleVisibility}>{isCountryShown ? 'Hide': 'Show'}</button>
+        <button onClick={handleVisibility}>{isShown[index] ? 'Hide': 'Show'}</button>
     )
 };
 
