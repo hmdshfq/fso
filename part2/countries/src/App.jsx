@@ -48,8 +48,6 @@ function App() {
             
             <CountriesForm search={search} handleSearch={handleSearch} />
             
-            <h2>Country Data</h2>
-            
             {search === "" && (
                 <p>Please type the name of a country in the search</p>
             )}
